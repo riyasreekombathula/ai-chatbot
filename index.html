@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto; }
+    .user { color: blue; }
+    .bot { color: green; }
+    input { width: 80%; padding: 10px; margin-top: 10px; }
+    button { padding: 10px; }
+  </style>
+</head>
+<body>
+
+<h1>AI Chatbot</h1>
+<div id="chat"></div>
+
+<input type="text" id="message" placeholder="Type your message..." />
+<button onclick="sendMessage()">Send</button>
+
+<script>
+async function sendMessage() {
+  const input = document.getElementById('message');
+  const message = input.value.trim();
+  if (!message) return;
+
+  // Show user message
+  const chatDiv = document.getElementById('chat');
+  chatDiv.innerHTML += `<div class="user"><strong>You:</strong> ${message}</div>`;
+
+  input.value = '';
+
+  try {
+    const res = await fetch('http://localhost:5000/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    const data = await res.json();
+
+    chatDiv.innerHTML += `<div class="bot"><strong>AI:</strong> ${data.reply}</div>`;
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+  } catch (err) {
+    chatDiv.innerHTML += `<div class="bot"><strong>AI:</strong> Error connecting to server.</div>`;
+    console.error(err);
+  }
+}
+</script>
+
+</body>
+</html>
